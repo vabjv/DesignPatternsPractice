@@ -1,3 +1,8 @@
+// 观察者模式（接口版）
+// 这个版本的弊端是，所有的Observer必须实现同一个接口，需要具备相同的行为
+// 实际情况下，观察者们并不一定具备相同的行为
+// 所以还有一个委托事件的版本
+
 public interface IObserver
 {
     void Update(float temperature, float humidity);
