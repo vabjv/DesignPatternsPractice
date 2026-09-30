@@ -1,80 +1,125 @@
+// 状态模式适用于有清晰的状态转换图的场景，而且这个状态转换往往是不可逆的
 using System;
+using System.ComponentModel;
 
-public abstract class State
+public interface OrderState
 {
-    public abstract void Charge(Passenger p);
+    void Pay(Order order);
+
+    void Ship(Order order);
+
+    void Confirm(Order order);
+
+    void Cancel(Order order);
 }
 
-public class ChildrenState : State
+// 待支付状态
+public class PendingPaymentState : OrderState
 {
-    public override void Charge(Passenger p)
+    public void Pay(Order order)
     {
-        if (p.Age < 18)
-        {
-            Console.WriteLine("未成年，不收费");
-        }
-        else
-        {
-            // 状态模式中，状态一定要变化
-            p.ChangeState(new HealthyAdultState());
-            p.Charge();
-        }
+        Console.WriteLine("支付订单");
+        order.ChangeState(new PaidState());
     }
-}
 
-public class HealthyAdultState : State
-{
-    public override void Charge(Passenger p)
+    public void Ship(Order order) => Console.WriteLine("未支付，不能取消");
+
+    public void Confirm(Order order) => Console.WriteLine("未支付，不能确认");
+
+    public void Cancel(Order order)
     {
-        if (!p.IsDisabled)
-        {
-            Console.WriteLine("成年人，收费");
-        }
-        else
-        {
-            p.ChangeState(new DisabledAdultState());
-            p.Charge();
-        }
+        Console.WriteLine("取消订单");
+        order.ChangeState(new CanceledState());
     }
 }
 
-public class DisabledAdultState : State
+public class PaidState : OrderState
 {
-    public override void Charge(Passenger p)
+    public void Pay(Order order) => Console.WriteLine("已支付，不用重复支付");
+
+    public void Ship(Order order)
     {
-        Console.WriteLine("残疾人，不收费");
+        Console.WriteLine("订单发货");
+        order.ChangeState(new ShippedState());
+    }
+
+    public void Confirm(Order order) => Console.WriteLine("未收货，不能确认");
+
+    public void Cancel(Order order)
+    {
+        Console.WriteLine("取消订单");
+        order.ChangeState(new CanceledState());
     }
 }
 
-public class Passenger
+public class ShippedState : OrderState
 {
-    public int Age { get; set; }
+    public void Pay(Order order) => Console.WriteLine("已发货，不能支付");
 
-    public bool IsDisabled { get; set; } = false;
+    public void Ship(Order order) => Console.WriteLine("已发货，不用重复发货");
 
-    private State state = new ChildrenState();
-
-    public void ChangeState(State state)
+    public void Confirm(Order order)
     {
-        this.state = state;
+        Console.WriteLine("确认收货");
+        order.ChangeState(new CompletedState());
     }
 
-    public void Charge()
+    public void Cancel(Order order) => Console.WriteLine("已发货，不能取消");
+}
+
+public class CompletedState : OrderState
+{
+    public void Pay(Order order) => Console.WriteLine("已完成，不能支付");
+
+    public void Ship(Order order) => Console.WriteLine("已完成，不能发货");
+
+    public void Confirm(Order order) => Console.WriteLine("已完成，不能重复确认");
+
+    public void Cancel(Order order) => Console.WriteLine("已完成，不能取消");
+}
+
+public class CanceledState : OrderState
+{
+    public void Pay(Order order) => Console.WriteLine("已取消，不能支付");
+
+    public void Ship(Order order) => Console.WriteLine("已取消，不能发货");
+
+    public void Confirm(Order order) => Console.WriteLine("已取消，不能确认");
+
+    public void Cancel(Order order) => Console.WriteLine("已取消，不能重复取消");
+}
+
+public class Order
+{
+    private OrderState _state = new PendingPaymentState();
+
+    public void ChangeState(OrderState state)
     {
-        state.Charge(this);
+        _state = state;
     }
+
+    public void Pay() => _state.Pay(this);
+
+    public void Ship() => _state.Ship(this);
+
+    public void Confirm() => _state.Confirm(this);
+
+    public void Cancel() => _state.Cancel(this);
 }
 
 public class Program
 {
     public static void Main()
     {
-        Passenger passenger = new Passenger();
-        passenger.Age = 12;
-        passenger.Charge();
-        passenger.Age = 24;
-        passenger.Charge();
-        passenger.IsDisabled = true;
-        passenger.Charge();
+        Order order = new Order();
+        order.Confirm();
+        order.Ship();
+        order.Cancel();
+        order.Pay();
+        order.ChangeState(new PendingPaymentState());
+        order.Pay();
+        order.Ship();
+        order.Confirm();
+        order.Pay();
     }
 }
