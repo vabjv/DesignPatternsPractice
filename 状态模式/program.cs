@@ -2,7 +2,7 @@
 using System;
 using System.ComponentModel;
 
-public interface OrderState
+public interface IOrderState
 {
     void Pay(Order order);
 
@@ -14,7 +14,7 @@ public interface OrderState
 }
 
 // 待支付状态
-public class PendingPaymentState : OrderState
+public class PendingPaymentState : IOrderState
 {
     public void Pay(Order order)
     {
@@ -33,7 +33,7 @@ public class PendingPaymentState : OrderState
     }
 }
 
-public class PaidState : OrderState
+public class PaidState : IOrderState
 {
     public void Pay(Order order) => Console.WriteLine("已支付，不用重复支付");
 
@@ -52,7 +52,7 @@ public class PaidState : OrderState
     }
 }
 
-public class ShippedState : OrderState
+public class ShippedState : IOrderState
 {
     public void Pay(Order order) => Console.WriteLine("已发货，不能支付");
 
@@ -67,7 +67,7 @@ public class ShippedState : OrderState
     public void Cancel(Order order) => Console.WriteLine("已发货，不能取消");
 }
 
-public class CompletedState : OrderState
+public class CompletedState : IOrderState
 {
     public void Pay(Order order) => Console.WriteLine("已完成，不能支付");
 
@@ -78,7 +78,7 @@ public class CompletedState : OrderState
     public void Cancel(Order order) => Console.WriteLine("已完成，不能取消");
 }
 
-public class CanceledState : OrderState
+public class CanceledState : IOrderState
 {
     public void Pay(Order order) => Console.WriteLine("已取消，不能支付");
 
@@ -91,9 +91,9 @@ public class CanceledState : OrderState
 
 public class Order
 {
-    private OrderState _state = new PendingPaymentState();
+    private IOrderState _state = new PendingPaymentState();
 
-    public void ChangeState(OrderState state)
+    public void ChangeState(IOrderState state)
     {
         _state = state;
     }
