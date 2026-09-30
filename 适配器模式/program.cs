@@ -35,11 +35,11 @@ public class Chinese
     }
 }
 
-public class Translater : ICommunication
+public class Translator : ICommunication
 {
     private readonly Chinese _chinese;
 
-    public Translater(string name)
+    public Translator(string name)
     {
         _chinese = new Chinese(name);
     }
@@ -56,7 +56,7 @@ public class Program
     {
         ICommunication english = new English("John");
         english.Say();
-        ICommunication translater = new Translater("小明");
-        translater.Say();
+        ICommunication translator = new Translator("小明");
+        translator.Say();
     }
 }
