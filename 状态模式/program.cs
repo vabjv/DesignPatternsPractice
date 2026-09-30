@@ -116,6 +116,7 @@ public class Program
         order.Ship();
         order.Cancel();
         order.Pay();
+        // 实际的状态模式中不能在客户端直接修改状态，状态的变化必须是订单类方法内部执行的，而不是客户端手动更改
         order.ChangeState(new PendingPaymentState());
         order.Pay();
         order.Ship();
