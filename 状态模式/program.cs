@@ -1,6 +1,5 @@
 // 状态模式适用于有清晰的状态转换图的场景，而且这个状态转换往往是不可逆的
 using System;
-using System.ComponentModel;
 
 public interface IOrderState
 {
